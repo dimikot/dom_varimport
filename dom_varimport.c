@@ -35,10 +35,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_varimport, 0, 0, 2)
     ZEND_ARG_INFO(0, var)
 ZEND_END_ARG_INFO();
 
-/* If you declare any globals in php_dom_varimport.h uncomment this:
-ZEND_DECLARE_MODULE_GLOBALS(dom_varimport)
-*/
-
 /* True global resources - no need for thread safety here */
 static int le_dom_varimport;
 
@@ -76,34 +72,10 @@ zend_module_entry dom_varimport_module_entry = {
 ZEND_GET_MODULE(dom_varimport)
 #endif
 
-/* {{{ PHP_INI
- */
-/* Remove comments and fill if you need to have entries in php.ini
-PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("dom_varimport.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_dom_varimport_globals, dom_varimport_globals)
-    STD_PHP_INI_ENTRY("dom_varimport.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_dom_varimport_globals, dom_varimport_globals)
-PHP_INI_END()
-*/
-/* }}} */
-
-/* {{{ php_dom_varimport_init_globals
- */
-/* Uncomment this function if you have INI entries
-static void php_dom_varimport_init_globals(zend_dom_varimport_globals *dom_varimport_globals)
-{
-    dom_varimport_globals->global_value = 0;
-    dom_varimport_globals->global_string = NULL;
-}
-*/
-/* }}} */
-
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(dom_varimport)
 {
-    /* If you have INI entries, uncomment these lines 
-    REGISTER_INI_ENTRIES();
-    */
     return SUCCESS;
 }
 /* }}} */
@@ -112,14 +84,10 @@ PHP_MINIT_FUNCTION(dom_varimport)
  */
 PHP_MSHUTDOWN_FUNCTION(dom_varimport)
 {
-    /* uncomment this line if you have INI entries
-    UNREGISTER_INI_ENTRIES();
-    */
     return SUCCESS;
 }
 /* }}} */
 
-/* Remove if there's nothing to do at request start */
 /* {{{ PHP_RINIT_FUNCTION
  */
 PHP_RINIT_FUNCTION(dom_varimport)
@@ -128,7 +96,6 @@ PHP_RINIT_FUNCTION(dom_varimport)
 }
 /* }}} */
 
-/* Remove if there's nothing to do at request end */
 /* {{{ PHP_RSHUTDOWN_FUNCTION
  */
 PHP_RSHUTDOWN_FUNCTION(dom_varimport)
@@ -144,10 +111,6 @@ PHP_MINFO_FUNCTION(dom_varimport)
     php_info_print_table_start();
     php_info_print_table_header(2, "dom_varimport support", "enabled");
     php_info_print_table_end();
-
-    /* Remove comments if you have entries in php.ini
-    DISPLAY_INI_ENTRIES();
-    */
 }
 /* }}} */
 
