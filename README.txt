@@ -1,7 +1,7 @@
 dom_varimport: a simple PHP extension to convert nested arrays into DOMDocument
 Version: 1.0
 (C) Dmitry Koterov, http://en.dklab.ru/lib/
-License: GPL
+License: LGPL
 
 MOTIVATION
 ----------
