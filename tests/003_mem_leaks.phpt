@@ -1,5 +1,5 @@
 --TEST--
-Check for dom_varimport presence
+Check for memory leaks absense
 --SKIPIF--
 <?php require_once('skipif.inc'); ?>
 --FILE--
