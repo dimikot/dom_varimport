@@ -292,7 +292,7 @@ PHP_FUNCTION(dom_varimport)
     zval *id, *var;
     xmlNodePtr nodep = NULL;
     xmlDocPtr doc = NULL;
-    xmlNodePtr root_node = NULL;
+    xmlNodePtr root_node = NULL, old_root_node;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oz", &id, &var) == FAILURE) {
         return;
@@ -309,7 +309,11 @@ PHP_FUNCTION(dom_varimport)
     }
 
     root_node = xmlNewNode(NULL, BAD_CAST "root");
-    xmlDocSetRootElement(doc, root_node);
+    old_root_node = xmlDocSetRootElement(doc, root_node);
+    if (old_root_node != NULL) {
+        xmlUnlinkNode(old_root_node);
+        xmlFreeNode(old_root_node);
+    }
 
     php_dom_varimport(root_node, var);
 }
