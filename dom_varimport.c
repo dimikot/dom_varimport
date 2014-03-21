@@ -33,6 +33,7 @@
 ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_varimport, 0, 0, 2)
     ZEND_ARG_OBJ_INFO(0, doc, DOMDocument, 0)
     ZEND_ARG_INFO(0, var)
+    ZEND_ARG_INFO(0, root_element)
 ZEND_END_ARG_INFO();
 
 /* True global resources - no need for thread safety here */
@@ -248,17 +249,23 @@ static void php_dom_varimport(xmlNodePtr node, zval *val) /* {{{ */
 }
 /* }}} */
 
-/* {{{ proto string dom_varimport(DOMDocument $doc, mixed $var)
-   Assigns serialized $var content to $doc root element. */
+/* {{{ proto string dom_varimport(DOMDocument doc, mixed var [, string root_element])
+   Assigns serialized var content to doc root element named root_element (defaults to "root"). */
 PHP_FUNCTION(dom_varimport)
 {
     zval *id, *var;
+    char *root_element_name = NULL;
+    int root_element_len = 0;
     xmlNodePtr nodep = NULL;
     xmlDocPtr doc = NULL;
     xmlNodePtr root_node = NULL, old_root_node;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oz", &id, &var) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oz|s", &id, &var, &root_element_name, &root_element_len) == FAILURE) {
         return;
+    }
+
+    if (!root_element_name || !php_is_valid_tag_name(root_element_name)) {
+        root_element_name = "root";
     }
 
     nodep = php_libxml_import_node(id TSRMLS_CC);
@@ -271,7 +278,7 @@ PHP_FUNCTION(dom_varimport)
         RETURN_FALSE;
     }
 
-    root_node = xmlNewNode(NULL, BAD_CAST "root");
+    root_node = xmlNewNode(NULL, BAD_CAST root_element_name);
     old_root_node = xmlDocSetRootElement(doc, root_node);
     if (old_root_node != NULL) {
         xmlUnlinkNode(old_root_node);
