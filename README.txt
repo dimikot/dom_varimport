@@ -30,17 +30,21 @@ The code:
 
   $doc = new DOMDocument();
   $doc->formatOutput = true;
-  dom_varimport($doc, array(
-      "a" => 111,
-      123,
-      0.5,
-      "arr" => array("1a" => "1a"),
-      "obj" => (object)array("prop" => "val"),
-      true,
-      false,
-      "b" => null,
-      "empty" => array(),
-  ));
+  dom_varimport(
+      $doc, 
+      array(
+          "a" => 111,
+          123,
+          0.5,
+          "arr" => array("1a" => "1a"),
+          "obj" => (object)array("prop" => "val"),
+          true,
+          false,
+          "b" => null,
+          "empty" => array(),
+      ), 
+      "root" // optional, defaults to "root"
+  );
   echo $doc->saveXML();
 
 prints:
