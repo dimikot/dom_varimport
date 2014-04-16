@@ -16,6 +16,7 @@ dom_varimport($doc, array(
     false,
     "b" => null,
     "empty" => array(),
+    doubleval(123),
 ));
 echo $doc->saveXML();
 ?>
@@ -24,7 +25,7 @@ echo $doc->saveXML();
 <root>
   <a key="a">111</a>
   <item key="0">123</item>
-  <item key="1">0.500000</item>
+  <item key="1">0.5</item>
   <arr key="arr">
     <item key="1a">1a</item>
   </arr>
@@ -35,4 +36,5 @@ echo $doc->saveXML();
   <item key="3"/>
   <b key="b"/>
   <empty key="empty"/>
+  <item key="4">123</item>
 </root>

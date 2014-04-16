@@ -206,6 +206,7 @@ static void php_dom_varimport(xmlNodePtr node, zval *val) /* {{{ */
     xmlNodePtr text = NULL;
     int len;
     char buf[128];
+    double dbl;
 
     switch (Z_TYPE_P(val))
     {
@@ -226,7 +227,12 @@ static void php_dom_varimport(xmlNodePtr node, zval *val) /* {{{ */
             break;
 
         case IS_DOUBLE:
-            len = sprintf(buf, "%f", Z_DVAL_P(val));
+            dbl = Z_DVAL_P(val);
+            if (!zend_isinf(dbl) && !zend_isnan(dbl)) {
+                len = snprintf(buf, sizeof(buf), "%.*k", (int)EG(precision), dbl);
+            } else {
+                len = sprintf(buf, "%f", dbl);
+            }
             text = xmlNewTextLen(BAD_CAST buf, len);
             break;
 
