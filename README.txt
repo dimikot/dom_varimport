@@ -1,5 +1,5 @@
 dom_varimport: a simple PHP extension to convert nested arrays into DOMDocument
-Version: 1.0
+Version: 1.01
 (C) Dmitry Koterov, http://en.dklab.ru/lib/
 License: LGPL
 
@@ -53,7 +53,7 @@ prints:
   <root>
     <a key="a">111</a>               <!-- plain key=value -->
     <item key="0">123</item>         <!-- numeric keys are "item" tags -->
-    <item key="1">0.500000</item>    <!-- double -->
+    <item key="1">0.5</item>         <!-- double -->
     <arr key="arr">                  <!-- nested array -->
       <item key="1a">1a</item>         <!-- invalid tag names are converted to "item" -->
     </arr>
