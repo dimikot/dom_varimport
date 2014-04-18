@@ -63,7 +63,7 @@ zend_module_entry dom_varimport_module_entry = {
     PHP_RSHUTDOWN(dom_varimport),   /* Replace with NULL if there's nothing to do at request end */
     PHP_MINFO(dom_varimport),
 #if ZEND_MODULE_API_NO >= 20010901
-    "1.01",
+    "1.02",
 #endif
     STANDARD_MODULE_PROPERTIES
 };
