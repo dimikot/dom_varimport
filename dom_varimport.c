@@ -29,6 +29,7 @@
 #include "php_dom_varimport.h"
 #include "ext/libxml/php_libxml.h"
 
+/* {{{ arginfo_dom_varimport[] */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_varimport, 0, 0, 2)
     ZEND_ARG_OBJ_INFO(0, doc, DOMDocument, 0)
     ZEND_ARG_INFO(0, var)
@@ -37,6 +38,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_varimport, 0, 0, 2)
     ZEND_ARG_INFO(0, key_attr)
     ZEND_ARG_INFO(0, notices_on_import_error)
 ZEND_END_ARG_INFO();
+/* }}} */
+
+/* {{{ dom_varimport_deps[] */
+#if ZEND_MODULE_API_NO >= 20050922
+static const zend_module_dep dom_varimport_deps[] = {
+    ZEND_MOD_REQUIRED("dom")
+    ZEND_MOD_END
+};
+#endif
+/* }}} */
 
 /* {{{ dom_varimport_functions[]
  *
@@ -51,9 +62,8 @@ const zend_function_entry dom_varimport_functions[] = {
 /* {{{ dom_varimport_module_entry
  */
 zend_module_entry dom_varimport_module_entry = {
-#if ZEND_MODULE_API_NO >= 20010901
-    STANDARD_MODULE_HEADER,
-#endif
+    STANDARD_MODULE_HEADER_EX, NULL,
+    dom_varimport_deps,
     "dom_varimport",
     dom_varimport_functions,
     NULL,
