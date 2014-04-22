@@ -49,18 +49,14 @@ static const zend_module_dep dom_varimport_deps[] = {
 #endif
 /* }}} */
 
-/* {{{ dom_varimport_functions[]
- *
- * Every user visible function must have an entry in dom_varimport_functions[].
- */
+/* {{{ dom_varimport_functions[] */
 const zend_function_entry dom_varimport_functions[] = {
     PHP_FE(dom_varimport, arginfo_dom_varimport)
     PHP_FE_END  /* Must be the last line in dom_varimport_functions[] */
 };
 /* }}} */
 
-/* {{{ dom_varimport_module_entry
- */
+/* {{{ dom_varimport_module_entry */
 zend_module_entry dom_varimport_module_entry = {
     STANDARD_MODULE_HEADER_EX, NULL,
     dom_varimport_deps,
@@ -82,8 +78,7 @@ zend_module_entry dom_varimport_module_entry = {
 ZEND_GET_MODULE(dom_varimport)
 #endif
 
-/* {{{ PHP_MINFO_FUNCTION
- */
+/* {{{ PHP_MINFO_FUNCTION */
 PHP_MINFO_FUNCTION(dom_varimport)
 {
     php_info_print_table_start();
@@ -93,6 +88,7 @@ PHP_MINFO_FUNCTION(dom_varimport)
 }
 /* }}} */
 
+/* dom_varimport() settings (function arguments). */
 typedef struct _dom_varimport_config {
     char *root_element_name;
     char *badname_element_name;
@@ -100,7 +96,10 @@ typedef struct _dom_varimport_config {
     zend_bool notices_on_import_error;
 } dom_varimport_config;
 
-static int php_is_valid_tag_name(char *s)
+/* Forward declaration for recursion. */
+static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key);
+
+static int php_is_valid_tag_name(char *s) /* {{{ */
 {
     if (s != NULL && (isalpha(*s) || *s == '_')) {
         ++s;
@@ -112,8 +111,7 @@ static int php_is_valid_tag_name(char *s)
     }
     return 0;
 }
-
-static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key); /* forward declaration */
+/* }}} */
 
 static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_config *conf) /* {{{ */
 {
