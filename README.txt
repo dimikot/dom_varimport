@@ -11,7 +11,7 @@ Some of projects use XSLT as a templating engine. To build XML for such engines,
 we need a very fast and memory efficient way to convert PHP nested arrays and
 objects into DOMDocument object. Also, produced XML should be straight-forward
 and as simple as it could be (BTW XMLRPC, SOAP and other XML-based formats are quite
-slopy in this case). So dom_varimport has been introduced: it produces DOMDocument
+sloppy in this case). So dom_varimport has been introduced: it produces DOMDocument
 from a nested array near 20 times faster than a hand-made code in native PHP
 (1 MB XML with thousands of nodes could be generated in 1-2 ms).
 
