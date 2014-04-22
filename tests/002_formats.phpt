@@ -4,8 +4,8 @@ Various data types
 <?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-$doc = new DOMDocument();
-$doc->formatOutput = true;
+require_once('init.inc');
+$doc = newDom();
 dom_varimport($doc, array(
     "a" => 111,
     123,
@@ -18,7 +18,7 @@ dom_varimport($doc, array(
     "empty" => array(),
     doubleval(123),
 ));
-echo $doc->saveXML();
+dumpDom($doc);
 ?>
 --EXPECT--
 <?xml version="1.0"?>

@@ -28,5 +28,6 @@ if test "$PHP_dom_varimport" != "no"; then
   ], [
     AC_MSG_ERROR([xml2-config not found. Please check your libxml2 installation.])
   ])
-fi
 
+  CFLAGS="$CFLAGS -Wall"
+fi

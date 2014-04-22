@@ -4,15 +4,15 @@ Recursion protection
 <?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-$doc = new DOMDocument();
-$doc->formatOutput = true;
+require_once('init.inc');
+$doc = newDom();
 $a = array("a" => "aaa");
 $a["b"] =& $a;
 dom_varimport($doc, $a);
-echo $doc->saveXML();
+dumpDom($doc);
 ?>
 --EXPECTF--
-Warning: dom_varimport(): recursion detected in %s
+Error[2]: dom_varimport(): recursion detected
 <?xml version="1.0"?>
 <root>
   <a key="a">aaa</a>

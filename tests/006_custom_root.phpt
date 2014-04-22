@@ -4,10 +4,10 @@ Custom root element name
 <?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-$doc = new DOMDocument();
-$doc->formatOutput = true;
+require_once('init.inc');
+$doc = newDom();
 dom_varimport($doc, array("a" => 123), 'data');
-echo $doc->saveXML();
+dumpDom($doc);
 ?>
 --EXPECTF--
 <?xml version="1.0"?>

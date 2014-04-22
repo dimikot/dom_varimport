@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author:                                                              |
+  | Author: Dmitry Koterov                                               |
   +----------------------------------------------------------------------+
 */
 
@@ -29,15 +29,14 @@
 #include "php_dom_varimport.h"
 #include "ext/libxml/php_libxml.h"
 
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_varimport, 0, 0, 2)
     ZEND_ARG_OBJ_INFO(0, doc, DOMDocument, 0)
     ZEND_ARG_INFO(0, var)
     ZEND_ARG_INFO(0, root_element)
+    ZEND_ARG_INFO(0, badname_element)
+    ZEND_ARG_INFO(0, key_attr)
+    ZEND_ARG_INFO(0, notices_on_import_error)
 ZEND_END_ARG_INFO();
-
-/* True global resources - no need for thread safety here */
-static int le_dom_varimport;
 
 /* {{{ dom_varimport_functions[]
  *
@@ -57,13 +56,13 @@ zend_module_entry dom_varimport_module_entry = {
 #endif
     "dom_varimport",
     dom_varimport_functions,
-    PHP_MINIT(dom_varimport),
-    PHP_MSHUTDOWN(dom_varimport),
-    PHP_RINIT(dom_varimport),       /* Replace with NULL if there's nothing to do at request start */
-    PHP_RSHUTDOWN(dom_varimport),   /* Replace with NULL if there's nothing to do at request end */
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     PHP_MINFO(dom_varimport),
 #if ZEND_MODULE_API_NO >= 20010901
-    "1.02",
+    PHP_DOM_VARIMPORT_VERSION,
 #endif
     STANDARD_MODULE_PROPERTIES
 };
@@ -73,53 +72,29 @@ zend_module_entry dom_varimport_module_entry = {
 ZEND_GET_MODULE(dom_varimport)
 #endif
 
-/* {{{ PHP_MINIT_FUNCTION
- */
-PHP_MINIT_FUNCTION(dom_varimport)
-{
-    return SUCCESS;
-}
-/* }}} */
-
-/* {{{ PHP_MSHUTDOWN_FUNCTION
- */
-PHP_MSHUTDOWN_FUNCTION(dom_varimport)
-{
-    return SUCCESS;
-}
-/* }}} */
-
-/* {{{ PHP_RINIT_FUNCTION
- */
-PHP_RINIT_FUNCTION(dom_varimport)
-{
-    return SUCCESS;
-}
-/* }}} */
-
-/* {{{ PHP_RSHUTDOWN_FUNCTION
- */
-PHP_RSHUTDOWN_FUNCTION(dom_varimport)
-{
-    return SUCCESS;
-}
-/* }}} */
-
 /* {{{ PHP_MINFO_FUNCTION
  */
 PHP_MINFO_FUNCTION(dom_varimport)
 {
     php_info_print_table_start();
     php_info_print_table_header(2, "dom_varimport support", "enabled");
+    php_info_print_table_row(2, "Version", PHP_DOM_VARIMPORT_VERSION);
     php_info_print_table_end();
 }
 /* }}} */
 
+typedef struct _dom_varimport_config {
+    char *root_element_name;
+    char *badname_element_name;
+    char *key_attr_name;
+    zend_bool notices_on_import_error;
+} dom_varimport_config;
+
 static int php_is_valid_tag_name(char *s)
 {
-    if (isalpha(*s) || *s == '_') {
+    if (s != NULL && (isalpha(*s) || *s == '_')) {
         ++s;
-        while (*s) {
+        while (*s != '\0') {
             if (!isalnum(*s) && *s != '_' && *s != '-' && *s != '.') return 0;
             ++s;
         }
@@ -128,11 +103,11 @@ static int php_is_valid_tag_name(char *s)
     return 0;
 }
 
-static void php_dom_varimport(xmlNodePtr node, zval *val);
+static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key); /* forward declaration */
 
-static void php_dom_varimport_array(xmlNodePtr node, zval **val) /* {{{ */
+static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_config *conf) /* {{{ */
 {
-    HashTable *ht;
+    HashTable *ht = NULL;
 
     if (Z_TYPE_PP(val) == IS_ARRAY) {
         ht = HASH_OF(*val);
@@ -156,7 +131,6 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val) /* {{{ */
         zval **data;
         ulong index;
         uint key_len;
-        xmlNodePtr text;
         xmlNodePtr e;
 
         zend_hash_internal_pointer_reset_ex(ht, &pos);
@@ -167,16 +141,16 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val) /* {{{ */
 
             if (zend_hash_get_current_data_ex(ht, (void **)&data, &pos) == SUCCESS) {
                 HashTable *tmp_ht = HASH_OF(*data);
-                if (tmp_ht) {
+                if (tmp_ht != NULL) {
                     tmp_ht->nApplyCount++;
                 }
 
-                tag = "item";
+                tag = conf->badname_element_name;
 
                 if (i == HASH_KEY_IS_STRING) {
                     if (key[0] == '\0' && Z_TYPE_PP(val) == IS_OBJECT) {
                         /* Skip protected and private members. */
-                        if (tmp_ht) {
+                        if (tmp_ht != NULL) {
                             tmp_ht->nApplyCount--;
                         }
                         continue;
@@ -189,19 +163,27 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val) /* {{{ */
                     key = buf;
                 }
 
-                e = xmlNewChild(node, NULL, BAD_CAST tag, NULL);
-                xmlNewProp(e, BAD_CAST "key", BAD_CAST key);
-                php_dom_varimport(e, *data);
+                if (tag != NULL) {
+                    if (conf->notices_on_import_error && tag == conf->badname_element_name) {
+                        php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Array key or object property \"%s\" cannot be used as XML element name; \"%s\" is used instead", key, tag);
+                    }
+                    e = xmlNewChild(node, NULL, BAD_CAST tag, NULL);
+                    if (conf->key_attr_name != NULL) {
+                        xmlNewProp(e, BAD_CAST conf->key_attr_name, BAD_CAST key);
+                    }
+                    php_dom_varimport(e, *data, conf, key);
+                }
 
-                if (tmp_ht) {
+                if (tmp_ht != NULL) {
                     tmp_ht->nApplyCount--;
                 }
             }
         }
     }
 }
+/* }}} */
 
-static void php_dom_varimport(xmlNodePtr node, zval *val) /* {{{ */
+static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key) /* {{{ */
 {
     xmlNodePtr text = NULL;
     int len;
@@ -242,10 +224,19 @@ static void php_dom_varimport(xmlNodePtr node, zval *val) /* {{{ */
 
         case IS_ARRAY:
         case IS_OBJECT:
-            php_dom_varimport_array(node, &val);
+            php_dom_varimport_array(node, &val, conf);
+            break;
+
+        case IS_RESOURCE:
+            if (conf->notices_on_import_error) {
+                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unsupported value type: resource, key: \"%s\"", cur_key);
+            }
             break;
 
         default:
+            if (conf->notices_on_import_error) {
+                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unsupported value type: unknown, key: \"%s\"", cur_key);
+            }
             break;
     }
 
@@ -255,43 +246,66 @@ static void php_dom_varimport(xmlNodePtr node, zval *val) /* {{{ */
 }
 /* }}} */
 
-/* {{{ proto string dom_varimport(DOMDocument doc, mixed var [, string root_element])
-   Assigns serialized var content to doc root element named root_element (defaults to "root"). */
+/* {{{ proto string dom_varimport(DOMDocument doc, mixed var [, string root_element = "root" [, string badname_element = "item" [, string key_attr = "key" [, bool notices_on_import_error = false]]]])
+   Assigns serialized var content to doc root element named root_element (defaults to "root").
+   Array keys or object properties become XML element names. If such name is invalid for XML,
+   badname_element is used instead (or, if badname_element is NULL, it is skipped). Anyway,
+   original array key or object property name is stored in XML element's attribute named key_attr
+   (if you pass NULL in key_attr, no such attribute is created). If notices_on_import_error is
+   set to true, notices are generated when badname_element is used instead of an XML-invalid
+   element name. */
 PHP_FUNCTION(dom_varimport)
 {
     zval *id, *var;
-    char *root_element_name = NULL;
-    int root_element_len = 0;
+    dom_varimport_config conf;
+    int dummy = 0;
     xmlNodePtr nodep = NULL;
     xmlDocPtr doc = NULL;
     xmlNodePtr root_node = NULL, old_root_node;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oz|s", &id, &var, &root_element_name, &root_element_len) == FAILURE) {
+    memset(&conf, 0, sizeof(conf));
+    conf.root_element_name = PHP_DOM_VARIMPORT_DEFAULT_ROOT_ELEMENT_NAME;
+    conf.badname_element_name = PHP_DOM_VARIMPORT_DEFAULT_BADNAME_ELEMENT_NAME;
+    conf.key_attr_name = PHP_DOM_VARIMPORT_DEFAULT_KEY_ATTR_NAME;
+    conf.notices_on_import_error = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "oz|ss!s!b", &id, &var, &conf.root_element_name, &dummy, &conf.badname_element_name, &dummy, &conf.key_attr_name, &dummy, &conf.notices_on_import_error) == FAILURE) {
         return;
     }
 
-    if (!root_element_name || !php_is_valid_tag_name(root_element_name)) {
-        root_element_name = "root";
+    if (!php_is_valid_tag_name(conf.root_element_name)) {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Passed invalid root_element \"%s\"; default value \"%s\" is used instead", conf.root_element_name, PHP_DOM_VARIMPORT_DEFAULT_ROOT_ELEMENT_NAME);
+        conf.root_element_name = PHP_DOM_VARIMPORT_DEFAULT_ROOT_ELEMENT_NAME; /* for NULL sets default value as well */
+    }
+
+    if (conf.badname_element_name != NULL && !php_is_valid_tag_name(conf.badname_element_name)) {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Passed invalid badname_element \"%s\"; default value \"%s\" is used instead", conf.badname_element_name, PHP_DOM_VARIMPORT_DEFAULT_BADNAME_ELEMENT_NAME);
+        conf.badname_element_name = PHP_DOM_VARIMPORT_DEFAULT_BADNAME_ELEMENT_NAME;
+    }
+
+    if (conf.key_attr_name != NULL && !php_is_valid_tag_name(conf.key_attr_name)) {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Passed invalid key_attr \"%s\"; default value \"%s\" is used instead", conf.key_attr_name, PHP_DOM_VARIMPORT_DEFAULT_KEY_ATTR_NAME);
+        conf.key_attr_name = PHP_DOM_VARIMPORT_DEFAULT_KEY_ATTR_NAME;
     }
 
     nodep = php_libxml_import_node(id TSRMLS_CC);
 
-    if (nodep) {
+    if (nodep != NULL) {
         doc = nodep->doc;
     }
     if (doc == NULL) {
-        php_error(E_WARNING, "Invalid Document");
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Passed invalid DOMDocument");
         RETURN_FALSE;
     }
 
-    root_node = xmlNewNode(NULL, BAD_CAST root_element_name);
+    root_node = xmlNewNode(NULL, BAD_CAST conf.root_element_name);
     old_root_node = xmlDocSetRootElement(doc, root_node);
     if (old_root_node != NULL) {
         xmlUnlinkNode(old_root_node);
         xmlFreeNode(old_root_node);
     }
 
-    php_dom_varimport(root_node, var);
+    php_dom_varimport(root_node, var, &conf, "(variable itself)");
 }
 /* }}} */
 

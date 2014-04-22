@@ -4,13 +4,13 @@ ArrayObject converting
 <?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
-$doc = new DOMDocument();
-$doc->formatOutput = true;
+require_once('init.inc');
+$doc = newDom();
 class C extends ArrayObject {}
 $a = new C();
 $a["a"] = "aaa";
 dom_varimport($doc, $a);
-echo $doc->saveXML();
+dumpDom($doc);
 ?>
 --EXPECTF--
 <?xml version="1.0"?>

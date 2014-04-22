@@ -4,11 +4,12 @@ Check for memory leaks absense
 <?php require_once('skipif.inc'); ?>
 --FILE--
 <?php
+require_once('init.inc');
 $delta = $d = $i = 0;
 $mem = memory_get_usage();
 $delta = $d = 0;
 for ($i = 0; $i < 8; $i++) {
-    $doc = new DOMDocument();
+    $doc = newDom();
     dom_varimport($doc, array("a" => 111, true, false, "b" => null, 123, 0.5, "arr" => array("1a" => "1a"), "obj" => (object)array("prop" => "val")));
     $d = memory_get_usage() - $mem;
     if ($i < 2) {

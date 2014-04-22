@@ -35,7 +35,7 @@ The code:
   $doc = new DOMDocument();
   $doc->formatOutput = true;
   dom_varimport(
-      $doc, 
+      $doc,
       array(
           "a" => 111,
           123,
@@ -46,8 +46,11 @@ The code:
           false,
           "b" => null,
           "empty" => array(),
-      ), 
-      "root" // optional, defaults to "root"
+      ),
+      "root", // optional, defaults to "root"
+      "item", // optional, defaults to "item", if NULL - invalid tag names are hidden
+      "key",  // optional, defaults to "key", if NULL - no key attributes are inserted
+      false   // optional, if true - show notices when keys are not valid XML elements
   );
   echo $doc->saveXML();
 
