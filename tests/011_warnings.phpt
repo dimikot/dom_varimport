@@ -2,6 +2,8 @@
 Warnings
 --SKIPIF--
 <?php require_once('skipif.inc'); ?>
+--EXTENSIONS--
+dom
 --FILE--
 <?php
 require_once('init.inc');
