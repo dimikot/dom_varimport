@@ -115,13 +115,7 @@ static int php_is_valid_tag_name(char *s) /* {{{ */
 
 static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_config *conf) /* {{{ */
 {
-    HashTable *ht = NULL;
-
-    if (Z_TYPE_PP(val) == IS_ARRAY) {
-        ht = HASH_OF(*val);
-    } else {
-        ht = Z_OBJPROP_PP(val);
-    }
+    HashTable *ht = HASH_OF(*val);
 
     if (ht == NULL) {
         return;
