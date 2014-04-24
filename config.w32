@@ -1,7 +1,6 @@
 // $Id$
 // vim:ft=javascript
 
-// Otherwise, use ARG_ENABLE
 ARG_ENABLE("dom_varimport", "enable dom_varimport support", "no");
 
 if (PHP_dom_varimport != "no") {
