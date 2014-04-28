@@ -97,7 +97,7 @@ typedef struct _dom_varimport_config {
 } dom_varimport_config;
 
 /* Forward declaration for recursion. */
-static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key);
+static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key TSRMLS_DC);
 
 static int php_is_valid_tag_name(char *s) /* {{{ */
 {
@@ -113,7 +113,7 @@ static int php_is_valid_tag_name(char *s) /* {{{ */
 }
 /* }}} */
 
-static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_config *conf) /* {{{ */
+static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_config *conf TSRMLS_DC) /* {{{ */
 {
     HashTable *ht = HASH_OF(*val);
 
@@ -173,7 +173,7 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_c
                     if (conf->key_attr_name != NULL) {
                         xmlNewProp(e, BAD_CAST conf->key_attr_name, BAD_CAST key);
                     }
-                    php_dom_varimport(e, *data, conf, key);
+                    php_dom_varimport(e, *data, conf, key TSRMLS_CC);
                 }
 
                 if (tmp_ht != NULL) {
@@ -185,7 +185,7 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_c
 }
 /* }}} */
 
-static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key) /* {{{ */
+static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *conf, char *cur_key TSRMLS_DC) /* {{{ */
 {
     xmlNodePtr text = NULL;
     int len;
@@ -226,7 +226,7 @@ static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *
 
         case IS_ARRAY:
         case IS_OBJECT:
-            php_dom_varimport_array(node, &val, conf);
+            php_dom_varimport_array(node, &val, conf TSRMLS_CC);
             break;
 
         case IS_RESOURCE:
@@ -307,7 +307,7 @@ PHP_FUNCTION(dom_varimport)
         xmlFreeNode(old_root_node);
     }
 
-    php_dom_varimport(root_node, var, &conf, "(variable itself)");
+    php_dom_varimport(root_node, var, &conf, "(variable itself)" TSRMLS_CC);
 }
 /* }}} */
 

@@ -3,7 +3,7 @@
 
 ARG_ENABLE("dom_varimport", "enable dom_varimport support", "no");
 
-if (PHP_dom_varimport != "no") {
+if (PHP_DOM_VARIMPORT != "no") {
     EXTENSION("dom_varimport", "dom_varimport.c");
     if (!ADD_EXTENSION_DEP("dom_varimport", "dom", true)) {
         MESSAGE("\tDOM support in dom_varimport is disabled");
