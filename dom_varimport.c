@@ -31,7 +31,7 @@
 
 /* {{{ arginfo_dom_varimport[] */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_dom_varimport, 0, 0, 2)
-    ZEND_ARG_OBJ_INFO(0, doc, DOMDocument, 0)
+    ZEND_ARG_OBJ_INFO(0, doc, DOMNode, 0)
     ZEND_ARG_INFO(0, var)
     ZEND_ARG_INFO(0, root_element)
     ZEND_ARG_INFO(0, badname_element)
@@ -154,6 +154,30 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_c
                         /* Skip protected and private members. */
                         if (tmp_ht != NULL) {
                             tmp_ht->nApplyCount--;
+                        }
+                        continue;
+                    }
+                    if (strcmp(key, "@attributes") == 0) {
+                        if (Z_TYPE_PP(data) == IS_ARRAY) {
+                            HashTable *arr_hash = Z_ARRVAL_P(*data);
+                            HashPosition arr_pointer;
+                            zval **arr_data;
+                            char *arr_key;
+                            ulong arr_index;
+                            uint arr_key_len;
+                            int j;
+
+                            zend_hash_internal_pointer_reset_ex(arr_hash, &arr_pointer);
+                            for (;; zend_hash_move_forward_ex(arr_hash, &arr_pointer)) {
+                                j = zend_hash_get_current_key_ex(arr_hash, &arr_key, &arr_key_len, &arr_index, 0, &arr_pointer);
+                                if (j == HASH_KEY_NON_EXISTANT)
+                                    break;
+                                if (zend_hash_get_current_data_ex(arr_hash, (void**) &arr_data, &arr_pointer) == SUCCESS) {
+                                    if (i == HASH_KEY_IS_STRING && Z_TYPE_PP(arr_data) == IS_STRING) {
+                                        xmlNewProp(node, BAD_CAST arr_key, BAD_CAST Z_STRVAL_P(*arr_data));
+                                    }
+                                }
+                            }
                         }
                         continue;
                     }
@@ -295,16 +319,24 @@ PHP_FUNCTION(dom_varimport)
     if (nodep != NULL) {
         doc = nodep->doc;
     }
+
     if (doc == NULL) {
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "Passed invalid DOMDocument");
         RETURN_FALSE;
     }
 
-    root_node = xmlNewNode(NULL, BAD_CAST conf.root_element_name);
-    old_root_node = xmlDocSetRootElement(doc, root_node);
-    if (old_root_node != NULL) {
-        xmlUnlinkNode(old_root_node);
-        xmlFreeNode(old_root_node);
+    if (nodep->type == XML_DOCUMENT_NODE) {
+        root_node = xmlNewNode(NULL, BAD_CAST conf.root_element_name);
+        old_root_node = xmlDocSetRootElement(doc, root_node);
+        if (old_root_node != NULL) {
+            xmlUnlinkNode(old_root_node);
+            xmlFreeNode(old_root_node);
+        }
+    } else if (nodep->type == XML_ELEMENT_NODE) {
+        root_node = nodep;
+    } else {
+        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Passed invalid DOMDocument or DOMElement");
+        RETURN_FALSE;
     }
 
     php_dom_varimport(root_node, var, &conf, "(variable itself)" TSRMLS_CC);
