@@ -172,7 +172,7 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_c
                                 j = zend_hash_get_current_key_ex(arr_hash, &arr_key, &arr_key_len, &arr_index, 0, &arr_pointer);
 
                                 if (j == HASH_KEY_NON_EXISTANT)
-                                    break;
+                            		break;
 
                                 if (zend_hash_get_current_data_ex(arr_hash, (void**) &arr_data, &arr_pointer) == SUCCESS) {
                                     if (xmlValidateName((xmlChar *) arr_key, 0) != 0) {
@@ -180,39 +180,39 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_c
                                     		php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Passed invalid attribute name, skipping");
                                         }
 		                                continue;
-                                	}
-                                    switch (Z_TYPE_P(*arr_data)) {
-                                        case IS_NULL:
-                                            break;
+									}
+									switch (Z_TYPE_P(*arr_data)) {
+										case IS_NULL:
+											break;
 
-                                        case IS_BOOL:
-                                            if (Z_BVAL_P(*arr_data)) {
-                                                xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "true");
-                                            } else {
-                                                xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "false");
-                                            }
-                                            break;
+										case IS_BOOL:
+											if (Z_BVAL_P(*arr_data)) {
+												xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "true");
+											} else {
+												xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "false");
+											}
+											break;
 
-                                        case IS_LONG:
-                                        case IS_DOUBLE:
-                                            convert_to_string(*arr_data);
-                                        case IS_STRING:
-                                            xmlNewProp(node, BAD_CAST arr_key, BAD_CAST Z_STRVAL_P(*arr_data));
-                                            break;
+										case IS_LONG:
+										case IS_DOUBLE:
+											convert_to_string(*arr_data);
+										case IS_STRING:
+											xmlNewProp(node, BAD_CAST arr_key, BAD_CAST Z_STRVAL_P(*arr_data));
+											break;
 
-                                        case IS_ARRAY:
-                                        case IS_OBJECT:
-                                        case IS_RESOURCE:
-                                            if (conf->notices_on_import_error) {
-                                                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Invalid attribute value: array/resource/object, attribute: \"%s\"", arr_key);
-                                            }
-                                            break;
+										case IS_ARRAY:
+										case IS_OBJECT:
+										case IS_RESOURCE:
+											if (conf->notices_on_import_error) {
+												php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Invalid attribute value: array/resource/object, attribute: \"%s\"", arr_key);
+											}
+											break;
 
-                                        default:
-                                            if (conf->notices_on_import_error) {
-                                                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unsupported attribute value: unknown, attribute: \"%s\"", arr_key);
-                                            }
-                                            break;
+										default:
+											if (conf->notices_on_import_error) {
+												php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unsupported attribute value: unknown, attribute: \"%s\"", arr_key);
+											}
+											break;
                                     }
                                 }
                             }
