@@ -1,11 +1,10 @@
 dom_varimport: a simple PHP extension to convert nested arrays into DOMDocument
-Version: 1.10
 Dmitry Koterov, http://en.dklab.ru/lib/dom_varimport/
 License: PHP License 3.01
 
 
 MOTIVATION
-----------
+==========
 
 Some of projects use XSLT as a templating engine. To build XML for such engines,
 we need a very fast and memory efficient way to convert PHP nested arrays and
@@ -17,7 +16,7 @@ from a nested array near 20 times faster than a hand-made code in native PHP
 
 
 HOW TO BUILD
-------------
+============
 
 phpize
 ./configure
@@ -28,7 +27,7 @@ phpize --clean
 
 
 SYNOPSIS
---------
+========
 
 The code:
 

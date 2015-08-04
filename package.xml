@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.9.5" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0   http://pear.php.net/dtd/tasks-1.0.xsd   http://pear.php.net/dtd/package-2.0   http://pear.php.net/dtd/package-2.0.xsd">
+ <name>dom_varimport</name>
+ <channel>pecl.php.net</channel>
+ <summary>Convert nested arrays into DOMDocument</summary>
+ <description>
+  The extension converts nested PHP arrays and objects into DOMDocument.
+  Some of projects use XSLT as a templating engine. To build XML for such engines,
+  we need a very fast and memory efficient way to convert PHP nested arrays and
+  objects into DOMDocument object. Also, produced XML should be straight-forward
+  and as simple as it could be (BTW XMLRPC, SOAP and other XML-based formats are quite
+  sloppy in this case). So dom_varimport has been introduced: it produces DOMDocument
+  from a nested array near 20 times faster than a hand-made code in native PHP
+  (1 MB XML with thousands of nodes could be generated in 1-2 ms).
+ </description>
+ <lead>
+  <name>Dmitry Koterov</name>
+  <user>dmitrykoterov</user>
+  <email>dmitry.koterov@gmail.com</email>
+  <active>yes</active>
+ </lead>
+ <date>2015-08-04</date>
+ <time>12:00:00</time>
+ <version>
+  <release>1.11.0</release>
+  <api>1.11.0</api>
+ </version>
+ <stability>
+  <release>stable</release>
+  <api>stable</api>
+ </stability>
+ <license uri="http://www.php.net/license">PHP</license>
+ <notes>
+** New Feature
+    * Special key @attributes to set predefined attributes, ability to populate DOMElement [Dimasik]
+    * Support for different types in @attributes array [Dimasik]
+    * Tests for special attribute and DOMElement [Dimasik]
+    * Enable Win32 build (ZTS support)
+ </notes>
+ <contents>
+  <dir baseinstalldir="/" name="/">
+   <file role="doc" name="CREDITS" />
+   <file role="doc" name="LICENSE"/>
+   <file role="doc" name="README" />
+   <file role="src" name="config.m4"/>
+   <file role="src" name="config.w32" />
+   <file role="src" name="dom_varimport.c"/>
+   <file role="src" name="php_dom_varimport.h"/>
+   <dir baseinstalldir="/" name="tests">
+    <file role="src" name="001.phpt" />
+    <file role="src" name="002_formats.phpt"/>
+    <file role="src" name="003_mem_leaks.phpt" />
+    <file role="src" name="004_recursion.phpt"/>
+    <file role="src" name="005_arrayobject.phpt" />
+    <file role="src" name="006_custom_root.phpt"/>
+    <file role="src" name="008_sync_version.phpt" />
+    <file role="src" name="009_custom_badname_element.phpt"/>
+    <file role="src" name="010_custom_key_attr.phpt" />
+    <file role="src" name="011_warnings.phpt"/>
+    <file role="src" name="012_notices.phpt" />
+    <file role="src" name="013_attributes.phpt"/>
+    <file role="src" name="014_domelement.phpt" />
+    <file role="src" name="900_stress.phpt"/>
+    <file role="src" name="init.inc" />
+    <file role="src" name="skipif.inc"/>
+   </dir>
+  </dir>
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.3.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.3</min>
+   </pearinstaller>
+   <extension>
+    <name>dom</name>
+   </extension>
+   <extension>
+    <name>libxml</name>
+   </extension>
+  </required>
+ </dependencies>
+ <providesextension>dom_varimport</providesextension>
+ <extsrcrelease/>
+ <changelog>
+
+  <release>
+   <date>2014-04-22</date>
+   <time>20:00:00</time>
+   <version>
+    <release>1.10.0</release>
+    <api>1.10.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+** Improvement
+    * Cleanup before PECL publishing
+    * Add "dom" extension dependency in tests
+   </notes>
+  </release>
+
+  <release>
+   <date>2014-04-18</date>
+   <time>18:00:00</time>
+   <version>
+    <release>1.2.0</release>
+    <api>1.2.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+** New Feature
+    * Double values serialization improvement
+    * A sample for root element name customization in README
+    * Support for root element name customization
+    * ArrayObject test added
+    * Test to check recursion protection
+   </notes>
+  </release>
+
+ </changelog>
+</package>
