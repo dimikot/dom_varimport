@@ -10,7 +10,7 @@ if test -z "$PHP_LIBXML_DIR"; then
   [  --with-libxml-dir=DIR   dom_varimport: libxml2 install prefix], no, no)
 fi
 
-if test "$PHP_dom_varimport" != "no"; then
+if test "$PHP_DOM_VARIMPORT" != "no"; then
 
   if test "$PHP_LIBXML" = "no"; then
     AC_MSG_ERROR([dom_varimport extension requires LIBXML extension, add --enable-libxml])
@@ -20,7 +20,8 @@ if test "$PHP_dom_varimport" != "no"; then
     AC_MSG_ERROR([dom_varimport extension requires DOM extension, add --enable-dom])
   fi
 
-  PHP_SETUP_LIBXML(XMLDIFF_SHARED_LIBADD, [
+  PHP_SETUP_LIBXML(DOM_VARIMPORT_SHARED_LIBADD, [
+    PHP_SUBST(DOM_VARIMPORT_SHARED_LIBADD)
     PHP_NEW_EXTENSION(dom_varimport, dom_varimport.c, $ext_shared)
     PHP_ADD_EXTENSION_DEP(dom_varimport, dom, true)
     PHP_ADD_EXTENSION_DEP(dom_varimport, libxml, true)
