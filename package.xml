@@ -42,21 +42,21 @@
    <file role="src" name="dom_varimport.c"/>
    <file role="src" name="php_dom_varimport.h"/>
    <dir baseinstalldir="/" name="tests">
-    <file role="src" name="001.phpt" />
-    <file role="src" name="002_formats.phpt"/>
-    <file role="src" name="003_mem_leaks.phpt" />
-    <file role="src" name="004_recursion.phpt"/>
-    <file role="src" name="005_arrayobject.phpt" />
-    <file role="src" name="006_custom_root.phpt"/>
-    <file role="src" name="009_custom_badname_element.phpt"/>
-    <file role="src" name="010_custom_key_attr.phpt" />
-    <file role="src" name="011_warnings.phpt"/>
-    <file role="src" name="012_notices.phpt" />
-    <file role="src" name="013_attributes.phpt"/>
-    <file role="src" name="014_domelement.phpt" />
-    <file role="src" name="900_stress.phpt"/>
-    <file role="src" name="init.inc" />
-    <file role="src" name="skipif.inc"/>
+    <file role="test" name="001.phpt" />
+    <file role="test" name="002_formats.phpt"/>
+    <file role="test" name="003_mem_leaks.phpt" />
+    <file role="test" name="004_recursion.phpt"/>
+    <file role="test" name="005_arrayobject.phpt" />
+    <file role="test" name="006_custom_root.phpt"/>
+    <file role="test" name="009_custom_badname_element.phpt"/>
+    <file role="test" name="010_custom_key_attr.phpt" />
+    <file role="test" name="011_warnings.phpt"/>
+    <file role="test" name="012_notices.phpt" />
+    <file role="test" name="013_attributes.phpt"/>
+    <file role="test" name="014_domelement.phpt" />
+    <file role="test" name="900_stress.phpt"/>
+    <file role="test" name="init.inc" />
+    <file role="test" name="skipif.inc"/>
    </dir>
   </dir>
  </contents>
