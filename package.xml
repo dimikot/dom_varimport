@@ -28,7 +28,7 @@
    <license uri="http://www.php.net/license">PHP</license>
    <notes>
 ** Bug
-    * @attribute: rare bug with numeric keys processing, more errors checks & tests
+    * @attribute: rare bug with numeric keys processing, more errors checks and tests
    </notes>
 
 
