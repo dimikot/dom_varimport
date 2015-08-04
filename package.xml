@@ -21,15 +21,15 @@
  </lead>
 
 
- <date>2015-08-04</date>
- <time>13:00:00</time>
- <version><release>1.11.1</release><api>1.11.0</api></version>
- <stability><release>stable</release><api>stable</api></stability>
- <license uri="http://www.php.net/license">PHP</license>
- <notes>
-** Typo
-    * Remove an outdated test (expired after the version is migrated from README to package.xml)
- </notes>
+   <date>2015-08-04</date>
+   <time>15:25:00</time>
+   <version><release>1.11.2</release><api>1.11.0</api></version>
+   <stability><release>stable</release><api>stable</api></stability>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+** Bug
+    * @attribute: rare bug with numeric keys processing, more errors checks & tests
+   </notes>
 
 
  <contents>
@@ -73,6 +73,18 @@
 
 
  <changelog>
+
+  <release>
+   <date>2015-08-04</date>
+   <time>13:00:00</time>
+   <version><release>1.11.1</release><api>1.11.0</api></version>
+   <stability><release>stable</release><api>stable</api></stability>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+** Typo
+    * Remove an outdated test (expired after the version is migrated from README to package.xml)
+   </notes>
+  </release>
 
   <release>
    <date>2015-08-04</date>
