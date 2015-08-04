@@ -101,15 +101,7 @@ static void php_dom_varimport(xmlNodePtr node, zval *val, dom_varimport_config *
 
 static int php_is_valid_tag_name(char *s) /* {{{ */
 {
-    if (s != NULL && (isalpha(*s) || *s == '_')) {
-        ++s;
-        while (*s != '\0') {
-            if (!isalnum(*s) && *s != '_' && *s != '-' && *s != '.') return 0;
-            ++s;
-        }
-        return 1;
-    }
-    return 0;
+    return xmlValidateName((xmlChar *)s, 0) == 0;
 }
 /* }}} */
 
@@ -158,66 +150,82 @@ static void php_dom_varimport_array(xmlNodePtr node, zval **val, dom_varimport_c
                         continue;
                     }
                     if (strcmp(key, "@attributes") == 0) {
-                        if (Z_TYPE_PP(data) == IS_ARRAY) {
-                            HashTable *arr_hash = Z_ARRVAL_P(*data);
-                            HashPosition arr_pointer;
+                        HashTable *arr_ht = HASH_OF(*data);
+                        if (arr_ht != NULL) {
+                            HashPosition arr_pos;
                             zval **arr_data;
                             char *arr_key;
                             ulong arr_index;
                             uint arr_key_len;
                             int j;
 
-                            zend_hash_internal_pointer_reset_ex(arr_hash, &arr_pointer);
-                            for (;; zend_hash_move_forward_ex(arr_hash, &arr_pointer)) {
-                                j = zend_hash_get_current_key_ex(arr_hash, &arr_key, &arr_key_len, &arr_index, 0, &arr_pointer);
+                            zend_hash_internal_pointer_reset_ex(arr_ht, &arr_pos);
+                            for (;; zend_hash_move_forward_ex(arr_ht, &arr_pos)) {
+                                j = zend_hash_get_current_key_ex(arr_ht, &arr_key, &arr_key_len, &arr_index, 0, &arr_pos);
 
                                 if (j == HASH_KEY_NON_EXISTANT)
                                     break;
 
-                                if (zend_hash_get_current_data_ex(arr_hash, (void**) &arr_data, &arr_pointer) == SUCCESS) {
-                                    if (xmlValidateName((xmlChar *) arr_key, 0) != 0) {
+                                if (j != HASH_KEY_IS_STRING) {
+                                    if (conf->notices_on_import_error) {
+                                        php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Passed a numeric attribute name, skipping");
+                                    }
+                                    continue;
+                                }
+
+                                if (arr_key[0] == '\0' && Z_TYPE_PP(data) == IS_OBJECT) {
+                                    /* Skip protected and private members. */
+                                    continue;
+                                }
+
+                                if (zend_hash_get_current_data_ex(arr_ht, (void**)&arr_data, &arr_pos) == SUCCESS) {
+                                    if (!php_is_valid_tag_name(arr_key)) {
                                         if (conf->notices_on_import_error) {
-                                    		php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Passed invalid attribute name, skipping");
+                                            php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Passed invalid attribute name, skipping");
                                         }
                                         continue;
                                     }
                                     switch (Z_TYPE_P(*arr_data)) {
-	                                    case IS_NULL:
-		                                    break;
+                                        case IS_NULL:
+                                            break;
 
-	                                    case IS_BOOL:
-		                                    if (Z_BVAL_P(*arr_data)) {
-			                                    xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "true");
-		                                    } else {
-			                                    xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "false");
-		                                    }
-		                                    break;
+                                        case IS_BOOL:
+                                            if (Z_BVAL_P(*arr_data)) {
+                                                xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "true");
+                                            } else {
+                                                xmlNewProp(node, BAD_CAST arr_key, BAD_CAST "false");
+                                            }
+                                            break;
 
-	                                    case IS_LONG:
-	                                    case IS_DOUBLE:
-		                                    convert_to_string(*arr_data);
-	                                    case IS_STRING:
-		                                    xmlNewProp(node, BAD_CAST arr_key, BAD_CAST Z_STRVAL_P(*arr_data));
-		                                    break;
+                                        case IS_LONG:
+                                        case IS_DOUBLE:
+                                            convert_to_string(*arr_data);
+                                        case IS_STRING:
+                                            xmlNewProp(node, BAD_CAST arr_key, BAD_CAST Z_STRVAL_P(*arr_data));
+                                            break;
 
-	                                    case IS_ARRAY:
-	                                    case IS_OBJECT:
-	                                    case IS_RESOURCE:
-		                                    if (conf->notices_on_import_error) {
-			                                    php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Invalid attribute value: array/resource/object, attribute: \"%s\"", arr_key);
-		                                    }
-		                                    break;
+                                        case IS_ARRAY:
+                                        case IS_OBJECT:
+                                        case IS_RESOURCE:
+                                            if (conf->notices_on_import_error) {
+                                                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Invalid attribute value: array/resource/object, attribute: \"%s\"", arr_key);
+                                            }
+                                            break;
 
-	                                    default:
-		                                    if (conf->notices_on_import_error) {
-			                                    php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unsupported attribute value: unknown, attribute: \"%s\"", arr_key);
-		                                    }
-		                                    break;
+                                        default:
+                                            if (conf->notices_on_import_error) {
+                                                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unsupported attribute value: unknown, attribute: \"%s\"", arr_key);
+                                            }
+                                            break;
                                     }
                                 }
                             }
+                        } else {
+                            if (conf->notices_on_import_error) {
+                                php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Addtibutes must be specified as an array or object");
+                            }
                         }
-                        continue;
+                        continue; /* finish parsing @attributes */
                     }
                     if (php_is_valid_tag_name(key)) {
                         tag = key;
