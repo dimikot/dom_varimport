@@ -17,10 +17,10 @@ $tmpl = array(
     "empty" => array(),
 );
 
+$longData = makeArray(5, $tmpl);
 $mems = array_fill(0, 40, round(1));
 $mem0 = memory_get_usage();
 for ($i = 0; $i < count($mems); $i++) {
-    $longData = makeArray(5, $tmpl);
     $doc = new DOMDocument();
     $doc->formatOutput = true;
     dom_varimport($doc, $longData);
