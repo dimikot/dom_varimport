@@ -1,0 +1,15 @@
+language: php
+
+php:
+  - 5.6
+  - 5.5
+  - 5.4
+  - 5.3
+
+script:
+  - phpize
+  - ./configure --quiet
+  - make
+  - MYPHP=`make findphp`
+  - MODULES=`pwd`/modules/
+  - SHOW_ONLY_GROUPS="FAIL,XFAIL,BORK,WARN,LEAK,SKIP" REPORT_EXIT_STATUS=1 TEST_PHP_EXECUTABLE=$MYPHP $MYPHP run-tests.php -n -d extension_dir=$MODULES -d extension=dom_varimport.so -q -x --show-diff
