@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/DmitryKoterov/dom_varimport.png?branch=master)](https://travis-ci.org/DmitryKoterov/dom_varimport)
 
-dom_varimport: a simple PHP extension to convert nested arrays into DOMDocument
-Dmitry Koterov, http://en.dklab.ru/lib/dom_varimport/
+dom_varimport: a simple PHP extension to convert nested arrays into DOMDocument  
+Dmitry Koterov, http://en.dklab.ru/lib/dom_varimport/  
 License: PHP License 3.01
 
 
