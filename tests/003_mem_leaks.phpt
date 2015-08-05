@@ -16,22 +16,22 @@ for ($i = 0; $i < 8; $i++) {
     $d = memory_get_usage() - $mem;
     if ($i < 2) {
         $delta = $d + 0; // +0 to avoid aliasing
-        printf("Iteration %d: initial\n", $i);
+        printf("Iteration %d: initial (%d)\n", $i, $d);
     } else {
-        if ($delta == $d) {
-            printf("Iteration %d: memory usage is stable\n", $i);
+        if ($delta >= $d) {
+            printf("Iteration %d: memory usage is stable (%d)\n", $i, $d);
         } else {
             printf("Iteration %d: memory usage increased (was %d at iteration %d, now %d)\n", $i, $delta, $i - 1, $d);
         }
     }
 }
 ?>
---EXPECT--
-Iteration 0: initial
-Iteration 1: initial
-Iteration 2: memory usage is stable
-Iteration 3: memory usage is stable
-Iteration 4: memory usage is stable
-Iteration 5: memory usage is stable
-Iteration 6: memory usage is stable
-Iteration 7: memory usage is stable
+--EXPECTF--
+Iteration 0: initial (%d)
+Iteration 1: initial (%d)
+Iteration 2: memory usage is stable (%d)
+Iteration 3: memory usage is stable (%d)
+Iteration 4: memory usage is stable (%d)
+Iteration 5: memory usage is stable (%d)
+Iteration 6: memory usage is stable (%d)
+Iteration 7: memory usage is stable (%d)
