@@ -29,7 +29,7 @@ Then, add the following to your `php.ini` file:
 
     extension=dom_varimport.so
 
-## SYNOPSIS
+## Synopsis
 
 The code:
 
