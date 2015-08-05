@@ -57,17 +57,17 @@ prints:
 
   <?xml version="1.0"?>
   <root>
-    <a key="a">111</a>               <!-- plain key=value -->
-    <item key="0">123</item>         <!-- numeric keys are "item" tags -->
-    <item key="1">0.5</item>         <!-- double -->
-    <arr key="arr">                  <!-- nested array -->
-      <item key="1a">1a</item>         <!-- invalid tag names are converted to "item" -->
+    <a key="a">111</a>             <!-- plain key=value -->
+    <item key="0">123</item>       <!-- numeric keys are "item" tags -->
+    <item key="1">0.5</item>       <!-- double -->
+    <arr key="arr">                <!-- nested array -->
+      <item key="1a">1a</item>     <!-- invalid tag names are converted to "item" -->
     </arr>
-    <obj key="obj">                  <!-- nested object -->
+    <obj key="obj">                <!-- nested object -->
       <prop key="prop">val</prop>
     </obj>
-    <item key="2">1</item>           <!-- true converts to 1 -->
-    <item key="3"/>                  <!-- false converts to an empty string -->
-    <b key="b"/>                     <!-- null also converts to an empty string -->
-    <empty key="empty"/>             <!-- empty array is an empty element -->
+    <item key="2">1</item>         <!-- true converts to 1 -->
+    <item key="3"/>                <!-- false converts to an empty string -->
+    <b key="b"/>                   <!-- null also converts to an empty string -->
+    <empty key="empty"/>           <!-- empty array is an empty element -->
   </root>
