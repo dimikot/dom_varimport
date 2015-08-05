@@ -21,14 +21,16 @@
  </lead>
 
 
-   <date>2015-08-04</date>
-   <time>15:25:00</time>
-   <version><release>1.11.2</release><api>1.11.0</api></version>
+   <date>2015-08-05</date>
+   <time>17:09:00</time>
+   <version><release>1.11.3</release><api>1.11.0</api></version>
    <stability><release>stable</release><api>stable</api></stability>
    <license uri="http://www.php.net/license">PHP</license>
    <notes>
-** Bug
-    * @attribute: rare bug with numeric keys processing, more errors checks and tests
+** Minor
+    * Typos in config.m4, fix test files role [remicollet]
+    * Relax a little test 003 - may help with tests "false-negatives" [remicollet]
+    * Update README, link to TravisCI integration
    </notes>
 
 
@@ -73,6 +75,18 @@
 
 
  <changelog>
+
+  <release>
+   <date>2015-08-04</date>
+   <time>15:25:00</time>
+   <version><release>1.11.2</release><api>1.11.0</api></version>
+   <stability><release>stable</release><api>stable</api></stability>
+   <license uri="http://www.php.net/license">PHP</license>
+   <notes>
+** Bug
+    * @attribute: rare bug with numeric keys processing, more errors checks and tests
+   </notes>
+  </release>
 
   <release>
    <date>2015-08-04</date>
