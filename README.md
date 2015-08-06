@@ -15,7 +15,6 @@ sloppy in this case). So dom_varimport has been introduced: it produces DOMDocum
 from a nested array near 20 times faster than a hand-made code in native PHP
 (1 MB XML with thousands of nodes could be generated in 1-2 ms).
 
-
 ## How to build
 
     phpize
@@ -28,6 +27,8 @@ from a nested array near 20 times faster than a hand-made code in native PHP
 Then, add the following to your `php.ini` file:
 
     extension=dom_varimport.so
+
+RPMs for Fedora, RHEL and CentOS are available in [remi](http://rpms.remirepo.net/) repository.
 
 ## Synopsis
 
